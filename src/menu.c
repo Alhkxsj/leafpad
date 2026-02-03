@@ -172,6 +172,9 @@ GtkWidget *create_menu_bar(GtkWidget *window)
 	gtk_accel_group_connect(
 		accel_group, GDK_T, GDK_CONTROL_MASK, 0,
 		g_cclosure_new_swap(G_CALLBACK(on_option_always_on_top), NULL, NULL));
+	gtk_accel_group_connect(
+		accel_group, GDK_M, GDK_CONTROL_MASK, 0,
+		g_cclosure_new_swap(G_CALLBACK(on_option_toggle_menubar), NULL, NULL));
 	gtk_widget_add_accelerator(
 		gtk_item_factory_get_widget(ifactory, "/Edit/Redo"),
 		"activate", accel_group, GDK_Y, GDK_CONTROL_MASK, 0);

@@ -310,6 +310,12 @@ void on_option_auto_indent(void)
 	indent_set_state(state);
 }
 
+// Toggle menu bar visibility
+void on_option_toggle_menubar(void)
+{
+	gtk_widget_set_visible(pub->mw->menubar, !gtk_widget_get_visible(pub->mw->menubar));
+}
+
 void on_help_about(void)
 {
 	const gchar *copyright = "Copyright \xc2\xa9 2004-2025 Tarot Osuji";
