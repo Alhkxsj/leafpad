@@ -26,7 +26,6 @@
 #include "dialog.h"
 #include "menu.h"
 #include "i18n.h"
-//#include "undo.h"
 
 gboolean check_file_writable(gchar *filename)
 {
