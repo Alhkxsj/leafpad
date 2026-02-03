@@ -1,5 +1,4 @@
 [Desktop Entry]
-Encoding=UTF-8
 _Name=Leafpad
 _Comment=Simple text editor
 Exec=leafpad %f
@@ -8,4 +7,5 @@ Terminal=false
 Type=Application
 MimeType=text/plain
 Categories=GTK;Utility;TextEditor;
+Keywords=text;editor;
 StartupNotify=true
