@@ -23,6 +23,7 @@ leafpad_SOURCES = \
 	utils.h utils.c \
 	emacs.h emacs.c \
 	gtksourceiter.h gtksourceiter.c \
+	recent.h recent.c \
 	i18n.h
 
 leafpad_LDADD    = $(GTK_LIBS) $(GNOMEPRINT_LIBS) $(INTLLIBS)

@@ -34,11 +34,13 @@ static GtkItemFactoryEntry menu_items[] =
 		G_CALLBACK(on_file_new), 0, "<StockItem>", GTK_STOCK_NEW },
 	{ N_("/File/_Open..."), "<control>O",
 		G_CALLBACK(on_file_open), 0, "<StockItem>", GTK_STOCK_OPEN },
+	{ "/File/sep1", NULL,
+		NULL, 0, "<Separator>" },
 	{ N_("/File/_Save"), "<control>S",
 		G_CALLBACK(on_file_save), 0, "<StockItem>", GTK_STOCK_SAVE },
 	{ N_("/File/Save _As..."), "<shift><control>S",
 		G_CALLBACK(on_file_save_as), 0, "<StockItem>", GTK_STOCK_SAVE_AS },
-	{ "/File/---", NULL,
+	{ "/File/sep2", NULL,
 		NULL, 0, "<Separator>" },
 #ifdef ENABLE_PRINT
 #	if GTK_CHECK_VERSION(2, 10, 0)
@@ -48,10 +50,14 @@ static GtkItemFactoryEntry menu_items[] =
 	{ N_("/File/_Print..."), "<control>P",
 		G_CALLBACK(on_file_print), 0, "<StockItem>", GTK_STOCK_PRINT },
 #	if GTK_CHECK_VERSION(2, 10, 0)
-	{ "/File/---", NULL,
+	{ "/File/sep3", NULL,
 		NULL, 0, "<Separator>" },
 #	endif
 #endif
+	{ N_("/File/_Close"), "<control>W",
+		G_CALLBACK(on_file_close), 0, "<StockItem>", GTK_STOCK_CLOSE },
+	{ "/File/sep4", NULL,
+		NULL, 0, "<Separator>" },
 	{ N_("/File/_Quit"), "<control>Q",
 		G_CALLBACK(on_file_quit), 0, "<StockItem>", GTK_STOCK_QUIT },
 	{ N_("/_Edit"),	 NULL,
@@ -60,7 +66,7 @@ static GtkItemFactoryEntry menu_items[] =
 		G_CALLBACK(on_edit_undo), 0, "<StockItem>", GTK_STOCK_UNDO },
 	{ N_("/Edit/_Redo"), "<shift><control>Z",
 		G_CALLBACK(on_edit_redo), 0, "<StockItem>", GTK_STOCK_REDO },
-	{ "/Edit/---", NULL,
+	{ "/Edit/sep1", NULL,
 		NULL, 0, "<Separator>" },
 	{ N_("/Edit/Cu_t"), "<control>X",
 		G_CALLBACK(on_edit_cut), 0, "<StockItem>", GTK_STOCK_CUT },
@@ -70,7 +76,7 @@ static GtkItemFactoryEntry menu_items[] =
 		G_CALLBACK(on_edit_paste), 0, "<StockItem>", GTK_STOCK_PASTE },
 	{ N_("/Edit/_Delete"), NULL,
 		G_CALLBACK(on_edit_delete), 0, "<StockItem>", GTK_STOCK_DELETE },
-	{ "/Edit/---", NULL,
+	{ "/Edit/sep2", NULL,
 		NULL, 0, "<Separator>" },
 	{ N_("/Edit/Select _All"), "<control>A",
 		G_CALLBACK(on_edit_select_all), 0 },
@@ -84,7 +90,7 @@ static GtkItemFactoryEntry menu_items[] =
 		G_CALLBACK(on_search_find_previous), 0 },
 	{ N_("/Search/_Replace..."), "<control>H",
 		G_CALLBACK(on_search_replace), 0, "<StockItem>", GTK_STOCK_FIND_AND_REPLACE },
-	{ "/Search/---", NULL,
+	{ "/Search/sep1", NULL,
 		NULL, 0, "<Separator>" },
 	{ N_("/Search/_Jump To..."), "<control>J",
 		G_CALLBACK(on_search_jump_to), 0, "<StockItem>", GTK_STOCK_JUMP_TO },
@@ -96,10 +102,14 @@ static GtkItemFactoryEntry menu_items[] =
 		G_CALLBACK(on_option_word_wrap), 0, "<CheckItem>" },
 	{ N_("/Options/_Line Numbers"), NULL,
 		G_CALLBACK(on_option_line_numbers), 0, "<CheckItem>" },
-	{ "/Options/---", NULL,
+	{ N_("/Options/_Dark Theme"), NULL,
+		G_CALLBACK(on_option_toggle_theme), 0, "<CheckItem>" },
+	{ "/Options/sep1", NULL,
 		NULL, 0, "<Separator>" },
 	{ N_("/Options/_Auto Indent"), NULL,
 		G_CALLBACK(on_option_auto_indent), 0, "<CheckItem>" },
+	{ N_("/Options/_Always on Top"), NULL,
+		G_CALLBACK(on_option_always_on_top), 0, "<CheckItem>" },
 	{ N_("/_Help"), NULL,
 		NULL, 0, "<Branch>" },
 	{ N_("/Help/_About"), NULL,
@@ -202,6 +212,35 @@ GtkWidget *create_menu_bar(GtkWidget *window)
 	menu_item_paste  = gtk_item_factory_get_widget(ifactory, "/Edit/Paste");
 	menu_item_delete = gtk_item_factory_get_widget(ifactory, "/Edit/Delete");
 	menu_sensitivity_from_selection_bound(FALSE);
+	
+	// Add recent files menu
+	GtkWidget *file_menu = gtk_item_factory_get_widget(ifactory, "/File");
+	GtkWidget *recent_menu = gtk_menu_new();
+	GtkWidget *recent_item;
+	GtkWidget *sep;
+	GList *recent_list = recent_get_list();
+	gint i = 1;
+
+	sep = gtk_separator_menu_item_new();
+	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), sep);
+	gtk_widget_show(sep);
+
+	recent_item = gtk_menu_item_new_with_label(_("Recent Files"));
+	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), recent_item);
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(recent_item), recent_menu);
+	gtk_widget_show(recent_item);
+
+	for (GList *l = recent_list; l && i <= MAX_RECENT_FILES; l = l->next, i++) {
+		gchar *basename = g_path_get_basename((gchar *)l->data);
+		gchar *label = g_strdup_printf("%d. %s", i, basename);
+		GtkWidget *item = gtk_menu_item_new_with_label(label);
+		g_signal_connect(G_OBJECT(item), "activate",
+			G_CALLBACK(on_file_open_recent), l->data);
+		gtk_menu_shell_append(GTK_MENU_SHELL(recent_menu), item);
+		gtk_widget_show(item);
+		g_free(label);
+		g_free(basename);
+	}
 	
 	return gtk_item_factory_get_widget(ifactory, "<main>");
 }

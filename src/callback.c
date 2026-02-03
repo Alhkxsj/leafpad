@@ -60,6 +60,7 @@ void on_file_open(void)
 	fi = get_fileinfo_from_selector(pub->fi, OPEN);
 	if (fi) {
 		save_config_file();
+		recent_add_file(fi->filename);
 		option = g_strdup_printf("--codeset=%s ", fi->charset);
 		comline = g_strdup_printf("%s %s%s", PACKAGE,
 			fi->charset ? option : "",
@@ -84,9 +85,8 @@ void on_file_open(void)
 			g_free(pub->fi);
 			pub->fi = fi;
 			undo_clear_all(pub->mw->buffer);
-//			set_main_window_title();
+			recent_add_file(fi->filename);
 			force_call_cb_modified_changed(pub->mw->view);
-//			undo_init(sd->mainwin->textview, sd->mainwin->textbuffer, sd->mainwin->menubar);
 		}
 	}
 }
@@ -314,10 +314,55 @@ void on_option_auto_indent(void)
 void on_option_toggle_menubar(void)
 {
 	gtk_widget_set_visible(pub->mw->menubar, !gtk_widget_get_visible(pub->mw->menubar));
-}
-
-void on_help_about(void)
-{
+	}
+	
+	// Open recent file
+	void on_file_open_recent(gpointer data)
+	{
+		gchar *filename = (gchar *)data;
+		FileInfo *fi;
+	
+		if (!filename || strlen(filename) == 0)
+			return;
+	
+		if (check_text_modification())
+			return;
+	
+		fi = g_malloc(sizeof(FileInfo));
+		fi->filename = g_strdup(filename);
+		fi->charset = pub->fi->charset_flag ? g_strdup(pub->fi->charset) : NULL;
+		fi->charset_flag = pub->fi->charset_flag;
+		fi->lineend = LF;
+	
+		if (file_open_real(pub->mw->view, fi)) {
+			g_free(fi);
+		} else {
+			g_free(pub->fi);
+			pub->fi = fi;
+			undo_clear_all(pub->mw->buffer);
+			recent_add_file(fi->filename);
+			force_call_cb_modified_changed(pub->mw->view);
+		}
+	}
+	
+	// Toggle dark theme
+	static gboolean dark_theme_active = FALSE;
+	
+	void on_option_toggle_theme(void)
+	{
+		GtkSettings *settings;
+	
+		dark_theme_active = !dark_theme_active;
+		settings = gtk_settings_get_default();
+	
+		if (dark_theme_active) {
+			g_object_set(settings, "gtk-application-prefer-dark-theme", TRUE, NULL);
+		} else {
+			g_object_set(settings, "gtk-application-prefer-dark-theme", FALSE, NULL);
+		}
+	}
+	
+	void on_help_about(void){
 	const gchar *copyright = "Copyright \xc2\xa9 2004-2025 Tarot Osuji";
 	const gchar *comments = _("GTK+ based simple text editor");
 	const gchar *authors[] = {
