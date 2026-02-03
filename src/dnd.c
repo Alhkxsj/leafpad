@@ -50,6 +50,7 @@ static GtkTargetEntry drag_types[] =
 
 static gint n_drag_types = sizeof(drag_types) / sizeof(drag_types[0]);
 
+// Initialize drag and drop handlers
 void dnd_init(GtkWidget *widget)
 {
 	gtk_drag_dest_set(widget, GTK_DEST_DEFAULT_ALL,
@@ -88,6 +89,7 @@ static void dnd_drag_data_recieved_handler(GtkWidget *widget,
 	GtkSelectionData *selection_data, guint info, guint time)
 {
 	static gboolean flag_called_once = FALSE;
+	static guint last_time = 0;
 	gchar **files;
 	gchar *filename;
 	gchar *comline;
@@ -98,6 +100,15 @@ static void dnd_drag_data_recieved_handler(GtkWidget *widget,
 	j = 1;
 #endif
 DV(g_print("DND start!\n"));
+	
+	// Prevent duplicate processing of the same drag event
+	if (time == last_time) {
+		last_time = 0;
+		g_signal_stop_emission_by_name(widget, "drag_data_received");
+DV(g_print("duplicate drag event blocked.\n"));
+		return;
+	}
+	last_time = time;
 	
 #if GTK_CHECK_VERSION(2, 10, 0)
 	if (g_strcasecmp(gdk_atom_name(context->targets->data),

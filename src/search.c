@@ -41,6 +41,7 @@ static gchar *string_find    = NULL;
 static gchar *string_replace = NULL;
 static gboolean match_case, replace_all;//, replace_mode = FALSE;
 
+// Highlight all matched strings in buffer
 static gboolean hlight_searched_strings(GtkTextBuffer *buffer, gchar *str)
 {
 	GtkTextIter iter, start, end;
@@ -80,6 +81,7 @@ static gboolean hlight_searched_strings(GtkTextBuffer *buffer, gchar *str)
 	return retval;
 }
 
+// Perform actual search in specified direction
 gboolean document_search_real(GtkWidget *textview, gint direction)
 {
 	GtkTextIter iter, match_start, match_end;
@@ -142,6 +144,7 @@ gboolean document_search_real(GtkWidget *textview, gint direction)
 	return res;
 }
 
+// Perform replace operation (single or all)
 static gint document_replace_real(GtkWidget *textview)
 {
 	GtkTextIter iter, match_start, match_end, rep_start;
@@ -211,6 +214,8 @@ static gint document_replace_real(GtkWidget *textview)
 					continue;
 				}
 			}
+			// Ensure selection is properly set before deletion
+			gtk_text_buffer_select_range(textbuffer, &match_start, &match_end);
 			gtk_text_buffer_delete_selection(textbuffer, TRUE, TRUE);
 			if (strlen(string_replace)) {
 				gtk_text_buffer_get_iter_at_mark(
