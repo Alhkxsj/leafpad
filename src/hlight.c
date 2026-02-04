@@ -19,7 +19,6 @@
 
 #include <string.h>
 #include "leafpad.h"
-//#include <gtk/gtk.h>
 
 static gboolean searched_flag = FALSE;
 
@@ -28,8 +27,6 @@ static void cb_changed(GtkTextBuffer *buffer)
 	GtkTextIter start, end;
 	
 	gtk_text_buffer_get_bounds(buffer, &start, &end);
-//	gtk_text_buffer_remove_tag_by_name(buffer,
-//		"searched", &start, &end);
 	gtk_text_buffer_remove_all_tags(buffer, &start, &end);
 	g_signal_handlers_block_by_func(G_OBJECT(buffer),
 		G_CALLBACK(cb_changed), NULL);

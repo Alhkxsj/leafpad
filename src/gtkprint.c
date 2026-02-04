@@ -102,7 +102,6 @@ static void cb_draw_page(GtkPrintOperation *op,
 	layout_rh = gtk_print_context_create_pango_layout(ctx);
 	pango_layout_set_font_description(layout_rh, font_desc);
 	pango_layout_set_text(layout_rh, page_text, -1);
-//	pango_layout_set_alignment(layout_rh, PANGO_ALIGN_RIGHT);
 	pango_layout_get_size(layout_rh, &layout_width, NULL);
 	cairo_move_to(cr,
 		page_width - layout_width / PANGO_SCALE, - 72 / 25.4 * 10);

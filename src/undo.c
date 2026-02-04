@@ -24,8 +24,6 @@
 
 #define DV(x)
 
-//"GTK_TEXT_VIEW(view)->overwrite_mode" can get overwrite_mode state
-
 typedef struct {
 	gchar command;
 	gint start;
@@ -76,7 +74,6 @@ static void undo_append_undo_info(GtkTextBuffer *buffer, gchar command, gint sta
 	seq_reserve = FALSE;
 	
 	undo_list = g_list_append(undo_list, ui);
-DV(g_print("undo_cb: %d %s (%d-%d)\n", command, str, start, end));
 }
 
 static void undo_create_undo_info(GtkTextBuffer *buffer, gchar command, gint start, gint end)
@@ -156,7 +153,6 @@ static void undo_create_undo_info(GtkTextBuffer *buffer, gchar command, gint sta
 	redo_list = undo_clear_info_list(redo_list);
 	prev_keyval = keyval;
 	clear_current_keyval();
-//	keyevent_setval(0);
 	gtk_widget_set_sensitive(undo_w, TRUE);
 	gtk_widget_set_sensitive(redo_w, FALSE);
 }
@@ -199,12 +195,10 @@ DV(g_print("undo_reset_modified_step: Reseted modified_step by %d\n", modified_s
 static void undo_check_modified_step(GtkTextBuffer *buffer)
 {
 	gboolean flag;
-	
+
 	flag = (modified_step == g_list_length(undo_list));
-//g_print("%d - %d = %d\n", modified_step, g_list_length(undo_list), flag);
 	if (gtk_text_buffer_get_modified(buffer) == flag)
 		gtk_text_buffer_set_modified(buffer, !flag);
-//g_print("change!\n");}
 }
 /*
 static void undo_check_modified_step(GtkTextBuffer *buffer)
@@ -305,8 +299,7 @@ gboolean undo_undo_real(GtkTextBuffer *buffer)
 	
 	undo_flush_temporal_buffer(buffer);
 	if (g_list_length(undo_list)) {
-//		undo_block_signal(buffer);
-		ui = g_list_last(undo_list)->data;
+ui = g_list_last(undo_list)->data;
 		gtk_text_buffer_get_iter_at_offset(buffer, &start_iter, ui->start);
 		switch (ui->command) {
 		case INS:
@@ -318,9 +311,6 @@ gboolean undo_undo_real(GtkTextBuffer *buffer)
 		}
 		redo_list = g_list_append(redo_list, ui);
 		undo_list = g_list_delete_link(undo_list, g_list_last(undo_list));
-DV(g_print("cb_edit_undo: undo left = %d, redo left = %d\n",
-g_list_length(undo_list), g_list_length(redo_list)));
-//		undo_unblock_signal(buffer);
 		if (g_list_length(undo_list)) {
 			if (((UndoInfo *)g_list_last(undo_list)->data)->seq)
 				return TRUE;
@@ -355,9 +345,6 @@ gboolean undo_redo_real(GtkTextBuffer *buffer)
 		}
 		undo_list = g_list_append(undo_list, ri);
 		redo_list = g_list_delete_link(redo_list, g_list_last(redo_list));
-DV(g_print("cb_edit_redo: undo left = %d, redo left = %d\n",
-g_list_length(undo_list), g_list_length(redo_list)));
-//		undo_unblock_signal(buffer);
 		if (ri->seq) {
 			undo_set_sequency(TRUE);
 			return TRUE;

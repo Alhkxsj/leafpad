@@ -81,7 +81,6 @@ gchar *get_file_basename(gchar *filename, gboolean bracket)
 gchar *parse_file_uri(gchar *uri)
 {
 	gchar *filename;
-//	gchar **strs;
 	
 	if (g_strstr_len(uri, 5, "file:"))
 		filename = g_filename_from_uri(uri, NULL, NULL);
@@ -91,13 +90,7 @@ gchar *parse_file_uri(gchar *uri)
 		else
 			filename = g_build_filename(g_get_current_dir(), uri, NULL);
 	}
-/*	if (strstr(filename, " ")) {
-		strs = g_strsplit(filename, " ", -1);
-		g_free(filename);
-		filename = g_strjoinv("\\ ", strs);
-		g_strfreev(strs);
-	}
-*/	
+	
 	return filename;
 }
 
@@ -156,9 +149,7 @@ gint file_open_real(GtkWidget *view, FileInfo *fi)
 			fi->charset_flag = FALSE;
 	}
 	
-//	undo_disconnect_signal(textbuffer);
-//	undo_block_signal(buffer);
-	force_block_cb_modified_changed(view);
+force_block_cb_modified_changed(view);
 	
 	gtk_text_buffer_set_text(buffer, "", 0);
 	gtk_text_buffer_get_start_iter(buffer, &iter);
@@ -171,9 +162,7 @@ gint file_open_real(GtkWidget *view, FileInfo *fi)
 	
 	force_unblock_cb_modified_changed(view);
 	menu_sensitivity_from_modified_flag(FALSE);
-//	undo_unblock_signal(buffer);
-	
-	return 0;
+return 0;
 }
 
 gint file_save_real(GtkWidget *view, FileInfo *fi)

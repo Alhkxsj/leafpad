@@ -39,7 +39,6 @@ enum {
 static GtkTargetEntry drag_types[] =
 {
 #if !GTK_CHECK_VERSION(2, 10, 0)
-//	{ "application/x-gtk-text-buffer-rich-text", GTK_TARGET_SAME_WIDGET, TARGET_SELF },
 	{ "GTK_TEXT_BUFFER_CONTENTS", GTK_TARGET_SAME_WIDGET, TARGET_SELF },
 #endif
 	{ "UTF8_STRING", 0, TARGET_UTF8_STRING },
@@ -50,7 +49,6 @@ static GtkTargetEntry drag_types[] =
 
 static gint n_drag_types = sizeof(drag_types) / sizeof(drag_types[0]);
 
-// Initialize drag and drop handlers
 void dnd_init(GtkWidget *widget)
 {
 	gtk_drag_dest_set(widget, GTK_DEST_DEFAULT_ALL,
@@ -80,7 +78,6 @@ static void dnd_open_first_file(gchar *filename)
 		pub->fi = fi;
 		undo_clear_all(pub->mw->buffer);
 		set_main_window_title();
-//		undo_init(sd->mainwin->textview, sd->mainwin->textbuffer, sd->mainwin->menubar);
 	}
 }	
 
@@ -105,13 +102,12 @@ DV(g_print("DND start!\n"));
 	if (time == last_time) {
 		last_time = 0;
 		g_signal_stop_emission_by_name(widget, "drag_data_received");
-DV(g_print("duplicate drag event blocked.\n"));
 		return;
 	}
 	last_time = time;
 	
 #if GTK_CHECK_VERSION(2, 10, 0)
-	if (g_strcasecmp(gdk_atom_name(context->targets->data),
+	if (g_ascii_strcasecmp(gdk_atom_name(context->targets->data),
 	    "GTK_TEXT_BUFFER_CONTENTS") != 0) {
 #else
 	if (info != TARGET_SELF) {
@@ -119,31 +115,10 @@ DV(g_print("duplicate drag event blocked.\n"));
 		if (flag_called_once) {
 			flag_called_once = FALSE;
 			g_signal_stop_emission_by_name(widget, "drag_data_received");
-DV(g_print("second drop signal killed.\n"));
 			return;
 		} else
 			flag_called_once = TRUE;
 	}
-	
-DV({	
-	g_print("info                      = %d\n", info);
-	g_print("time                      = %d\n", time);
-	g_print("context->protocol         = %d\n", context->protocol);
-	g_print("context->is_source        = %d\n", context->is_source);
-	g_print("context->targets          = %d\n", g_list_length(context->targets));
-	g_print("context->target           = %s\n", gdk_atom_name(context->targets->data));
-/*	g_print("context->target           = %s\n", gdk_atom_name(context->targets->next->data));
-	g_print("context->target           = %s\n", gdk_atom_name(context->targets->next->next->data));
-	g_print("context->actions          = %d\n", context->actions);
-	g_print("context->suggested_action = %d\n", context->suggested_action);
-	g_print("context->action           = %d\n", context->action);
-	g_print("selection_data->selection = %s\n", gdk_atom_name(selection_data->selection));
-	g_print("selection_data->target    = %s\n", gdk_atom_name(selection_data->target));
-*/	g_print("selection_data->type      = %s\n", gdk_atom_name(selection_data->type));
-	g_print("selection_data->format    = %d\n", selection_data->format);
-	g_print("selection_data->length    = %d\n", selection_data->length);
-	g_print("%s\n", selection_data->data);
-});	
 	
 	if (selection_data->data && info == TARGET_URI_LIST) {
 		files = g_strsplit((gchar *)selection_data->data, "\n" , -1);
@@ -203,37 +178,11 @@ static gboolean dnd_drag_motion_handler(GtkWidget *widget,
 	targets = context->targets;
 	while (targets) {
 		name = gdk_atom_name(targets->data);
-DV(g_print("%s\n", name));
 		if (g_ascii_strcasecmp(name, "text/uri-list") == 0)
 			flag = TRUE;
 		g_free(name);
 		targets = targets->next;
 	}
-/*	if (flag)
-		context->action = GDK_ACTION_DEFAULT;
-	else
-		context->action = GDK_ACTION_COPY;
-//	g_signal_stop_emission_by_name(widget, "drag_motion");
-*/	
-/*	if (!flag) {
-		gint bx, by;
-		GtkTextIter iter;
-		
-		gtk_text_view_window_to_buffer_coords(GTK_TEXT_VIEW(widget),
-			GTK_TEXT_WINDOW_WIDGET,
-			x, y, &bx, &by);
-		gtk_text_view_get_iter_at_location(GTK_TEXT_VIEW(widget), &iter, bx, by);
-		if (!dnd_mark) {
-			dnd_mark = gtk_text_buffer_create_mark(GTK_TEXT_VIEW(widget)->buffer,
-			    NULL, &iter, TRUE);
-			gtk_text_mark_set_visible(dnd_mark, TRUE);
-		} else
-			gtk_text_mark_set_visible(dnd_mark, FALSE);
-			gtk_text_buffer_move_mark(GTK_TEXT_VIEW(widget)->buffer,
-			    dnd_mark, &iter);
-			gtk_text_mark_set_visible(dnd_mark, TRUE);
-	}
-*/	
 	return flag;
 }
 
