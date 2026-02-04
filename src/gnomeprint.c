@@ -73,8 +73,7 @@ static void print_glyph_list(gboolean is_newline)
 
 static GnomeFont *find_proper_font(gunichar ch)
 {
-//	GnomeFont *gfont;
-	GnomeFontFace *gface;
+GnomeFontFace *gface;
 	PangoFont *pfont;
 	PangoFontset *pfontset;
 	
@@ -83,13 +82,7 @@ static GnomeFont *find_proper_font(gunichar ch)
 		gtk_widget_get_style(pub->mw->view)->font_desc,
 		gtk_get_default_language());
 	pfont = pango_fontset_get_font(pfontset, ch);
-/*	
-	g_print("\n%s\n",
-		pango_font_description_to_string(
-			pango_font_describe(pfont)
-		)
-	);
-*/	
+	
 	gface =
 		gnome_font_face_find_closest_from_pango_font(pfont);
 	g_object_unref(pfont);
@@ -139,7 +132,6 @@ g_print("margin_bottom = %f\n", margin_bottom);
 	tab_width = gnome_font_face_get_glyph_width(font_face,
 		gnome_font_face_lookup_default(font_face, g_utf8_get_char(" ")))
 		/ 1000 * FONT_SIZE * get_current_tab_width();
-DV(	g_print("tab_width = %f\n", tab_width));
 	
 	/* Draw texts to canvas */
 	gpx = gnome_print_job_get_context(job);
@@ -222,8 +214,6 @@ DV(				g_print("\n"));
 				}
 				gnome_glyphlist_glyph(gl, glyph);
 				gl_width += g_width;
-DV(				g_print("%02X ", glyph));
-DV(				g_print("%f (%f)\n", gl_width, gnome_font_get_glyph_width(font, glyph)));
 			}
 		}
 		p = g_utf8_next_char(p);
@@ -289,7 +279,6 @@ gint create_gnomeprint_session(void)
 			job = create_job(gpc);
 			preview = gnome_print_job_preview_new(job,
 				(guchar *)_("Print Preview"));
-//			gtk_window_set_transient_for(GTK_WINDOW(preview), GTK_WINDOW(dialog));
 			gtk_window_set_modal(GTK_WINDOW(preview), TRUE);
 			gtk_widget_show(preview);
 			g_signal_connect(G_OBJECT(preview), "destroy",

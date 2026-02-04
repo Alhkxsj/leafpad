@@ -36,6 +36,7 @@ typedef struct {
 	gboolean wordwrap;
 	gboolean linenumbers;
 	gboolean autoindent;
+	gboolean darktheme;
 } Conf;
 
 static void load_config_file(Conf *conf)
@@ -72,6 +73,8 @@ static void load_config_file(Conf *conf)
 			conf->linenumbers = atoi(buf);
 			fgets(buf, sizeof(buf), fp);
 			conf->autoindent = atoi(buf);
+			fgets(buf, sizeof(buf), fp);
+			conf->darktheme = atoi(buf);
 		}
 		g_strfreev(num);
 	}
@@ -85,7 +88,7 @@ void save_config_file(void)
 	GtkItemFactory *ifactory;
 	gint width, height;
 	gchar *fontname;
-	gboolean wordwrap, linenumbers, autoindent;
+	gboolean wordwrap, linenumbers, autoindent, darktheme;
 	
 	gtk_window_get_size(GTK_WINDOW(pub->mw->window), &width, &height);
 	fontname = get_font_name_from_widget(pub->mw->view);
@@ -99,6 +102,9 @@ void save_config_file(void)
 	autoindent = gtk_check_menu_item_get_active(
 		GTK_CHECK_MENU_ITEM(gtk_item_factory_get_item(ifactory,
 			"/Options/Auto Indent")));
+	darktheme = gtk_check_menu_item_get_active(
+		GTK_CHECK_MENU_ITEM(gtk_item_factory_get_item(ifactory,
+			"/Options/Dark Theme")));
 	
 #if GLIB_CHECK_VERSION(2, 6, 0)
 	path = g_build_filename(g_get_user_config_dir(), PACKAGE, NULL);
@@ -130,6 +136,7 @@ void save_config_file(void)
 	fprintf(fp, "%d\n", wordwrap);
 	fprintf(fp, "%d\n", linenumbers);
 	fprintf(fp, "%d\n", autoindent);
+	fprintf(fp, "%d\n", darktheme);
 	fclose(fp);
 	
 	g_free(fontname);
@@ -139,8 +146,6 @@ void save_config_file(void)
 static struct option longopts[] = {
 	{ "help", no_argument, 0, '?' },
 	{ "codeset", required_argument, 0, 0 },
-//	{ "charset", required_argument, 0, 0 },
-//	{ "encoding", required_argument, 0, 0 },
 	{ "tab-width", required_argument, 0, 't' },
 	{ "jump", required_argument, 0, 'j' },
 	{ "version", no_argument, 0, 'v' },
@@ -254,13 +259,13 @@ static void parse_args(gint argc, gchar **argv, FileInfo *fi)
 	} while (c != -1);
 #endif
 	
-	if (fi->charset 
-		&& (g_strcasecmp(fi->charset, get_default_charset()) != 0)
-		&& (g_strcasecmp(fi->charset, "UTF-8") != 0)) {
+	if (fi->charset
+		&& (g_ascii_strcasecmp(fi->charset, get_default_charset()) != 0)
+		&& (g_ascii_strcasecmp(fi->charset, "UTF-8") != 0)) {
 		encarray = get_encoding_items(get_encoding_code());
 		for (i = 0; i < ENCODING_MAX_ITEM_NUM; i++)
 			if (encarray->item[i])
-				if (g_strcasecmp(fi->charset, encarray->item[i]) == 0)
+				if (g_ascii_strcasecmp(fi->charset, encarray->item[i]) == 0)
 					break;
 		if (i == ENCODING_MAX_ITEM_NUM)
 			fi->charset_flag = TRUE;
@@ -310,6 +315,7 @@ gint main(gint argc, gchar **argv)
 	conf->wordwrap    = FALSE;
 	conf->linenumbers = FALSE;
 	conf->autoindent  = FALSE;
+	conf->darktheme   = FALSE;
 	
 	load_config_file(conf);
 	
@@ -328,6 +334,16 @@ gint main(gint argc, gchar **argv)
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
 		gtk_item_factory_get_widget(ifactory, "/Options/Auto Indent")),
 		conf->autoindent);
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
+		gtk_item_factory_get_widget(ifactory, "/Options/Dark Theme")),
+		conf->darktheme);
+	
+	if (conf->darktheme) {
+		GtkSettings *settings = gtk_settings_get_default();
+		g_object_set(settings, "gtk-application-prefer-dark-theme", TRUE, NULL);
+	}
+	
+	recent_load();
 	
 	gtk_widget_show_all(pub->mw->window);
 	g_free(conf->fontname);
@@ -341,7 +357,6 @@ gint main(gint argc, gchar **argv)
 	undo_init(pub->mw->view,
 		gtk_item_factory_get_widget(ifactory, "/Edit/Undo"),
 		gtk_item_factory_get_widget(ifactory, "/Edit/Redo"));
-//	hlight_init(pub->mw->buffer);
 	dnd_init(pub->mw->view);
 	
 	if (pub->fi->filename)
@@ -358,8 +373,7 @@ gint main(gint argc, gchar **argv)
 			get_default_charset(), NULL, NULL, NULL);
 		g_free(stdin_data);
 	
-//		gtk_text_buffer_set_text(buffer, "", 0);
-		gtk_text_buffer_get_start_iter(pub->mw->buffer, &iter);
+gtk_text_buffer_get_start_iter(pub->mw->buffer, &iter);
 		gtk_text_buffer_insert(pub->mw->buffer, &iter, str, strlen(str));
 		gtk_text_buffer_get_start_iter(pub->mw->buffer, &iter);
 		gtk_text_buffer_place_cursor(pub->mw->buffer, &iter);
@@ -378,7 +392,6 @@ gint main(gint argc, gchar **argv)
 	}
 	
 	set_main_window_title();
-//	hlight_apply_all(pub->mw->buffer);
 	
 	gtk_main();
 	

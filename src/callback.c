@@ -61,6 +61,7 @@ void on_file_open(void)
 	if (fi) {
 		save_config_file();
 		recent_add_file(fi->filename);
+		recent_save();
 		option = g_strdup_printf("--codeset=%s ", fi->charset);
 		comline = g_strdup_printf("%s %s%s", PACKAGE,
 			fi->charset ? option : "",
@@ -86,6 +87,7 @@ void on_file_open(void)
 			pub->fi = fi;
 			undo_clear_all(pub->mw->buffer);
 			recent_add_file(fi->filename);
+			recent_save();
 			force_call_cb_modified_changed(pub->mw->view);
 		}
 	}
@@ -100,9 +102,8 @@ gint on_file_save(void)
 		return on_file_save_as();
 	if (file_save_real(pub->mw->view, pub->fi))
 		return -1;
-//	set_main_window_title();
+	recent_save();
 	force_call_cb_modified_changed(pub->mw->view);
-//	undo_reset_step_modif();
 	return 0;
 }
 
@@ -120,9 +121,8 @@ gint on_file_save_as(void)
 	g_free(pub->fi);
 	pub->fi = fi;
 	undo_clear_all(pub->mw->buffer);
-//	set_main_window_title();
+	recent_save();
 	force_call_cb_modified_changed(pub->mw->view);
-//	undo_init(sd->mainwin->textview, sd->mainwin->textbuffer, sd->mainwin->menubar);
 	return 0;
 }
 #ifdef ENABLE_PRINT
@@ -161,11 +161,8 @@ void on_file_close(void)
 		pub->fi->charset_flag = FALSE;
 		pub->fi->lineend = LF;
 		undo_clear_all(pub->mw->buffer);
-//		set_main_window_title();
 		force_call_cb_modified_changed(pub->mw->view);
 		force_unblock_cb_modified_changed(pub->mw->view);
-//		undo_unblock_signal(textbuffer);
-//		undo_init(sd->mainwin->textview, textbuffer, sd->mainwin->menubar);
 	}
 }
 
@@ -200,11 +197,7 @@ void on_edit_copy(void)
 void on_edit_paste(void)
 {
 	g_signal_emit_by_name(G_OBJECT(pub->mw->view), "paste-clipboard");
-//	TODO: Use modify signal!!
-/*	gtk_text_view_scroll_mark_onscreen(
-		GTK_TEXT_VIEW(pub->mw->view),
-		gtk_text_buffer_get_insert(pub->mw->buffer));
-*/}
+}
 
 void on_edit_delete(void)
 {
@@ -314,10 +307,9 @@ void on_option_auto_indent(void)
 void on_option_toggle_menubar(void)
 {
 	gtk_widget_set_visible(pub->mw->menubar, !gtk_widget_get_visible(pub->mw->menubar));
-	}
-	
-	// Open recent file
-	void on_file_open_recent(gpointer data)
+}
+
+void on_file_open_recent(gpointer data)
 	{
 		gchar *filename = (gchar *)data;
 		FileInfo *fi;
@@ -341,16 +333,16 @@ void on_option_toggle_menubar(void)
 			pub->fi = fi;
 			undo_clear_all(pub->mw->buffer);
 			recent_add_file(fi->filename);
+			recent_save();
 			force_call_cb_modified_changed(pub->mw->view);
 		}
 	}
 	
-	// Toggle dark theme
 	static gboolean dark_theme_active = FALSE;
-	
-	void on_option_toggle_theme(void)
-	{
-		GtkSettings *settings;
+
+void on_option_toggle_theme(void)
+{
+	GtkSettings *settings;
 	
 		dark_theme_active = !dark_theme_active;
 		settings = gtk_settings_get_default();
@@ -380,8 +372,7 @@ void on_option_toggle_menubar(void)
 		NULL
 	};
 	gtk_show_about_dialog(GTK_WINDOW(pub->mw->window),
-//		"name", PACKAGE_NAME,
-		"version", PACKAGE_VERSION,
+"version", PACKAGE_VERSION,
 		"copyright", copyright,
 		"comments", comments,
 		"authors", authors,

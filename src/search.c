@@ -163,8 +163,6 @@ static gint document_replace_real(GtkWidget *textview)
 		gtk_text_buffer_get_start_iter(textbuffer, &iter);
 		
 		gtk_text_buffer_get_end_iter(textbuffer, &match_end);
-//		gtk_text_buffer_remove_tag_by_name(textbuffer,
-//			"replaced", &iter, &match_end);
 		gtk_text_buffer_remove_all_tags(textbuffer,
 			&iter, &match_end);
 	} else {
@@ -277,7 +275,6 @@ static void toggle_sensitivity(GtkWidget *w, gint pos1, gint pos2, gint *pos3)
 			gtk_dialog_set_response_sensitive(GTK_DIALOG(gtk_widget_get_toplevel(w)),
 				GTK_RESPONSE_OK, TRUE);
 		entry_len += pos2;
-//		entry_len = entry_len + pos2;
 	} else {
 		entry_len = entry_len + pos1 - pos2;
 		if (!entry_len)
@@ -445,8 +442,7 @@ void run_dialog_jump_to(GtkWidget *textview)
 		gtk_text_buffer_get_iter_at_line(textbuffer, &iter,
 			gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(spinner)) - 1);
 		gtk_text_buffer_place_cursor(textbuffer, &iter);
-//		gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(textview), &iter, 0.1, FALSE, 0.5, 0.5);
-		scroll_to_cursor(textbuffer, 0.25);
+scroll_to_cursor(textbuffer, 0.25);
 	}
 	
 	gtk_widget_destroy (dialog);

@@ -1,4 +1,7 @@
 SUBDIRS = src data po
 
-EXTRA_DIST = \
-	intltool-extract.in intltool-merge.in intltool-update.in
+EXTRA_DIST =
+
+# Clean all build artifacts in the build directory
+clean-local:
+	find . -mindepth 1 -delete

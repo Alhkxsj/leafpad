@@ -27,21 +27,18 @@
 #define STDIN_DELAY_MICROSECONDS 100000
 #define GEDIT_STDIN_BUFSIZE 1024
 
-// imported from gedit
 #ifdef G_OS_UNIX
 gchar *gedit_utils_get_stdin (void)
 {
 	GString * file_contents;
 	gchar *tmp_buf = NULL;
 	guint buffer_length;
-//	GnomeVFSResult	res;
 	fd_set rfds;
 	struct timeval tv;
 	
 	FD_ZERO (&rfds);
 	FD_SET (0, &rfds);
 
-	// wait for 1/4 of a second
 	tv.tv_sec = 0;
 	tv.tv_usec = STDIN_DELAY_MICROSECONDS;
 
@@ -61,9 +58,7 @@ gchar *gedit_utils_get_stdin (void)
 
 		if (ferror (stdin) != 0)
 		{
-//			res = gnome_vfs_result_from_errno (); 
-		
-			g_free (tmp_buf);
+g_free (tmp_buf);
 			g_string_free (file_contents, TRUE);
 			return NULL;
 		}

@@ -25,5 +25,7 @@
 void recent_add_file(const gchar *filename);
 GList *recent_get_list(void);
 void recent_clear(void);
+void recent_save(void);
+void recent_load(void);
 
 #endif /* _RECENT_H */

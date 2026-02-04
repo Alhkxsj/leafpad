@@ -55,8 +55,7 @@ get_lines (GtkTextView  *text_view,
 {
 	GtkTextIter iter;
 	gint count;
-	gint size;
-		gint last_line_num;
+	gint last_line_num;
 	
 	g_array_set_size (buffer_coords, 0);
 	g_array_set_size (numbers, 0);
@@ -68,7 +67,6 @@ get_lines (GtkTextView  *text_view,
 	 * Stop when we pass y2
 	 */
 	count = 0;
-	size = 0;
 	
 	while (!gtk_text_iter_is_end (&iter))
 	{
@@ -113,7 +111,6 @@ line_numbers_expose (GtkWidget      *widget,
 {
 	GtkTextView *text_view;
 	GdkWindow *win;
-//	GtkStyle *style;
 	PangoLayout *layout;
 	PangoAttrList *alist;
 	PangoAttribute *attr;
@@ -124,8 +121,7 @@ line_numbers_expose (GtkWidget      *widget,
 	gint layout_width;
 	gint justify_width = 0;
 	gint i;
-//	gchar *str;
-	gchar str [8];  /* we don't expect more than ten million lines */
+	gchar str [8];
 	GdkGC *gc;
 	gint height;
 	
@@ -157,10 +153,7 @@ line_numbers_expose (GtkWidget      *widget,
 	if (event->window != win)
 		return FALSE;
 	
-//	style = gtk_style_copy (widget->style);
-//	style = gtk_style_copy (gtk_widget_get_default_style());
-	
-	y1 = event->area.y;
+y1 = event->area.y;
 	y2 = y1 + event->area.height;
 	
 	gtk_text_view_window_to_buffer_coords (text_view,
@@ -209,7 +202,6 @@ DV({g_print("Painting line numbers %d - %d\n",
 	g_snprintf (str, sizeof (str),
 			"%d", MAX (99, gtk_text_buffer_get_line_count(text_view->buffer)));
 	pango_layout_set_text (layout, str, -1);
-//	g_free (str);
 	
 	pango_layout_get_pixel_size (layout, &layout_width, NULL);
 	
@@ -218,10 +210,8 @@ DV({g_print("Painting line numbers %d - %d\n",
 		gtk_text_view_set_border_window_size (text_view,
 			GTK_TEXT_WINDOW_LEFT, layout_width + margin + submargin);
 	else {
-//		if ((gtk_text_view_get_border_window_size (text_view, GTK_TEXT_WINDOW_LEFT) - 5) > layout_width) {
-			gtk_text_view_set_border_window_size (text_view,
-				GTK_TEXT_WINDOW_LEFT, min_number_window_width + margin + submargin);
-//		}
+		gtk_text_view_set_border_window_size (text_view,
+			GTK_TEXT_WINDOW_LEFT, min_number_window_width + margin + submargin);
 		justify_width = min_number_window_width - layout_width;
 	}
 	
@@ -282,7 +272,6 @@ DV({g_print("Painting line numbers %d - %d\n",
 	g_array_free (numbers, TRUE);
 	
 	g_object_unref (G_OBJECT (layout));
-//	g_object_ref (G_OBJECT (style));
 	
 	/* don't stop emission, need to draw children */
 	

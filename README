@@ -29,16 +29,19 @@ Installation
 ============
 
 Leafpad requires GTK+-2.x.x libraries.
-Printing feature requires libgnomeprintui-2.2 optionally.
 
-Simple install procedure:
+Build procedure:
 
-  $ tar xzvf leafpad-x.x.x.tar.gz       # unpack the sources
-  $ cd leafpad-x.x.x                    # change to the toplevel directory
-  $ ./configure                         # run the `configure' script
-  $ make                                # build Leafpad
+  $ git clone https://github.com/Alhkxsj/leafpad.git
+  $ cd leafpad
+  $ autoreconf -i
+  $ mkdir build && cd build
+  $ ../configure
+  $ make
+  $ make install
+  $ termux: make install prefix=$PREFIX
   [ Become root if necessary ]
-  # make install-strip                  # install Leafpad
+  # make install-strip
 
 See the file 'INSTALL' for more detailed information.
 

@@ -32,7 +32,6 @@ void add_about_stock(void)
 	
 	stock = g_malloc(sizeof(GtkStockItem));
 	stock->stock_id = "my-gtk-about";
-//	stock->label = _("_About");
 	stock->label = "About";
 	stock->modifier = 0;
 	stock->keyval = 0;

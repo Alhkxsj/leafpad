@@ -137,7 +137,6 @@ static GtkWidget *init_menu_item_manual_charset(gchar *manual_charset)
 		menu_item_manual_charset = gtk_menu_item_new_with_label(str);
 		label = GTK_LABEL(GTK_BIN(menu_item_manual_charset)->child);
 	} else
-//		gtk_label_set_text(GTK_LABEL(GTK_BIN(menu_item_manual_charset)->child), str);
 		gtk_label_set_text(label, str);
 	g_free(str);
 	
@@ -159,8 +158,7 @@ static gboolean get_manual_charset(GtkOptionMenu *option_menu, FileInfo *selecte
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 			GTK_STOCK_OK, GTK_RESPONSE_OK,
 			NULL);
-//	gtk_dialog_set_has_separator(GTK_DIALOG(dialog), FALSE);
-	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 	
 	vbox = gtk_vbox_new(FALSE, 0);
@@ -273,7 +271,7 @@ static GtkWidget *create_charset_menu(FileInfo *selected_fi)
 	i = 0;
 	if (selected_fi->charset) {
 		do {
-			if (g_strcasecmp(selected_fi->charset, ctable->charset[i]) == 0)
+			if (g_ascii_strcasecmp(selected_fi->charset, ctable->charset[i]) == 0)
 				break;
 			i++;
 		} while (i < ctable->num);
@@ -315,8 +313,7 @@ static GtkWidget *create_file_selector(FileInfo *selected_fi)
 	selector = gtk_file_selection_new(title);
 #endif
 	
-//	align = gtk_alignment_new(0.5, 0, 0, 0);
-	align = gtk_alignment_new(1, 0, 0, 0);
+align = gtk_alignment_new(1, 0, 0, 0);
 #if ENABLE_CHOOSER
 	gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(selector), align);
 #else
@@ -329,8 +326,7 @@ static GtkWidget *create_file_selector(FileInfo *selected_fi)
 	label = gtk_label_new_with_mnemonic(_("C_haracter Coding:"));
 	gtk_label_set_mnemonic_widget(GTK_LABEL(label), option_menu_charset);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
-//	gtk_table_set_row_spacings(GTK_TABLE(table), 5);
-	gtk_table_set_col_spacing(GTK_TABLE(table), 0, 8);
+gtk_table_set_col_spacing(GTK_TABLE(table), 0, 8);
 	gtk_table_attach_defaults(GTK_TABLE(table), option_menu_charset, 1, 2, 0, 1);
 	if (mode == SAVE) {
 		option_menu_lineend = create_lineend_menu(selected_fi);

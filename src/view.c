@@ -38,7 +38,6 @@ gboolean scroll_to_cursor(GtkTextBuffer *buffer, gdouble within_margin)
 {
 	GtkTextIter iter;
 	
-//	gtk_text_buffer_get_start_iter(buffer, &iter);
 	gtk_text_buffer_get_iter_at_mark(buffer, &iter,
 		gtk_text_buffer_get_insert(buffer));
 	return gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(pub->mw->view),
@@ -118,9 +117,8 @@ static gboolean cb_key_press_event(GtkWidget *view, GdkEventKey *event)
 	gtk_text_view_get_iter_location(GTK_TEXT_VIEW(view), &iter, &prev_rect);
 	
 	keyval = 0;
-//g_print("key-press-event: 0x%X\n", event->keyval);
 	switch (event->keyval) {
-	case GDK_Up:		// Try [Shift]+[Down]. it works bad.
+	case GDK_Up:
 	case GDK_Down:
 		if (gtk_text_view_move_mark_onscreen(GTK_TEXT_VIEW(view), mark)) {
 			GdkRectangle iter_rect;
@@ -189,7 +187,6 @@ static gboolean cb_key_press_event(GtkWidget *view, GdkEventKey *event)
 		|| (event->keyval == GDK_Control_L)
 		|| (event->keyval == GDK_Control_R)) {
 		keyval = keyval + 0x10000;
-//g_print("=================================================\n");
 	}
 	
 	return FALSE;
@@ -254,16 +251,7 @@ void force_unblock_cb_modified_changed(GtkWidget *view)
 	g_signal_handlers_unblock_by_func(G_OBJECT(GTK_TEXT_VIEW(view)->buffer), 
 		G_CALLBACK(cb_modified_changed), view);
 }
-/*
-static void cb_mark_set(GtkTextBuffer *buffer, GtkTextIter *iter, GtkTextMark *mark)
-{
-	if (gtk_text_mark_get_name(mark))
-{g_print(gtk_text_mark_get_name(mark));
-}else g_print("|");
-		menu_sensitivity_from_selection_bound(
-			gtk_text_buffer_get_selection_bounds(buffer, NULL, NULL));
-}
-*/
+
 static void cb_mark_changed(GtkTextBuffer *buffer)
 {
 	menu_sensitivity_from_selection_bound(
@@ -279,29 +267,7 @@ static void cb_focus_event(GtkWidget *view, GdkEventFocus *event)
 	if (event->in)
 		menu_sensitivity_from_clipboard();
 }
-/*
-static void cb_begin_user_action(GtkTextBuffer *buffer, GtkWidget *view)
-{
-	g_signal_handlers_unblock_by_func(G_OBJECT(buffer), 
-		G_CALLBACK(cb_modified_changed), view);
-//	g_print("begin-user-action\n");
-}
 
-static void cb_end_user_action(GtkTextBuffer *buffer, GtkWidget *view)
-{
-	g_signal_handlers_block_by_func(G_OBJECT(buffer), 
-		G_CALLBACK(cb_modified_changed), view);
-	gtk_text_view_scroll_mark_onscreen(		// TODO: require?
-		GTK_TEXT_VIEW(view),
-		gtk_text_buffer_get_insert(buffer));
-//	g_print("end-user-action\n");
-}
-*//*
-static void cb_something(GtkTextBuffer *buffer, gchar *data)
-{
-	g_print("%s\n", data);
-}
-*/
 void set_view_scroll(void)
 {
 	view_scroll_flag = TRUE;
@@ -310,8 +276,7 @@ void set_view_scroll(void)
 static void cb_end_user_action(GtkTextBuffer *buffer, GtkWidget *view)
 {
 	if (view_scroll_flag) {
-		gtk_text_view_scroll_mark_onscreen(		// TODO: require?
-			GTK_TEXT_VIEW(view),
+		gtk_text_view_scroll_mark_onscreen(GTK_TEXT_VIEW(view),
 			gtk_text_buffer_get_insert(buffer));
 		view_scroll_flag = FALSE;
 	}
@@ -319,15 +284,12 @@ static void cb_end_user_action(GtkTextBuffer *buffer, GtkWidget *view)
 
 GtkWidget *create_text_view(void)
 {
- 	GtkWidget *view;
+	GtkWidget *view;
 	GtkTextBuffer *buffer;
-	
+
 	view = gtk_text_view_new();
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
-	
-//	gtk_text_view_set_left_margin(GTK_TEXT_VIEW(view), 1);
-//	gtk_text_view_set_right_margin(GTK_TEXT_VIEW(view), 1);
-	
+
 	g_signal_connect(G_OBJECT(view), "key-press-event",
 		G_CALLBACK(cb_key_press_event), NULL);
 	g_signal_connect(G_OBJECT(view), "button-press-event",
@@ -339,14 +301,11 @@ GtkWidget *create_text_view(void)
 	g_signal_connect_after(G_OBJECT(view), "paste-clipboard",
 		G_CALLBACK(set_view_scroll),
 		gtk_text_buffer_get_insert(buffer));
-/*	g_signal_connect_after(G_OBJECT(view), "paste-clipboard",
-		G_CALLBACK(gtk_text_view_scroll_mark_onscreen),
-		gtk_text_buffer_get_insert(buffer));*/
 	g_signal_connect_after(G_OBJECT(view), "focus-in-event",
 		G_CALLBACK(cb_focus_event), NULL);
 	g_signal_connect_after(G_OBJECT(view), "focus-out-event",
 		G_CALLBACK(cb_focus_event), NULL);
-	
+
 	g_signal_connect(G_OBJECT(buffer), "mark-set",
 		G_CALLBACK(cb_mark_changed), NULL);
 	g_signal_connect(G_OBJECT(buffer), "mark-deleted",
@@ -355,13 +314,8 @@ GtkWidget *create_text_view(void)
 		G_CALLBACK(cb_modified_changed), view);
 	g_signal_connect_after(G_OBJECT(buffer), "end-user-action",
 		G_CALLBACK(cb_end_user_action), view);
-/*	g_signal_connect(G_OBJECT(buffer), "begin-user-action",
-		G_CALLBACK(cb_begin_user_action), view);
-	g_signal_connect_after(G_OBJECT(buffer), "end-user-action",
-		G_CALLBACK(cb_end_user_action), view);
-	cb_end_user_action(buffer, view);
-*/	
+
 	linenum_init(view);
-	
+
 	return view;
 }

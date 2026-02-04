@@ -24,7 +24,6 @@
 
 static void cb_key_release_event(GtkWidget *view, GdkEventKey *event)
 {
-//g_print("key-release-event: 0x%X\n", event->keyval);
 	switch (event->keyval) {
 	case GDK_x:
 	case GDK_X:
@@ -34,7 +33,6 @@ static void cb_key_release_event(GtkWidget *view, GdkEventKey *event)
 
 static void cb_key_press_event(GtkWidget *view, GdkEventKey *event)
 {
-//g_print("key-release-event: 0x%X\n", event->keyval);
 	if (event->keyval < 0x1000 || event->keyval == GDK_Escape) {
 		switch (event->keyval) {
 		case GDK_f:
@@ -107,7 +105,6 @@ static void emacs_key_prefix(void)
 	gulong id;
 	
 	gtk_widget_set_sensitive(pub->mw->menubar, FALSE);
-//	gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(pub->mw->view), FALSE);
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(pub->mw->view), FALSE);
 	/* waiting for release C-x */
 	id = g_signal_connect(G_OBJECT(pub->mw->window), "key-release-event",
@@ -122,8 +119,7 @@ static void emacs_key_prefix(void)
 	g_signal_handler_disconnect(G_OBJECT(pub->mw->window), id);
 	
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(pub->mw->view), TRUE);
-//	gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(pub->mw->view), TRUE);
-	gtk_widget_set_sensitive(pub->mw->menubar, TRUE);
+gtk_widget_set_sensitive(pub->mw->menubar, TRUE);
 }
 
 gboolean check_emacs_key_theme(GtkWindow *window, GtkItemFactory *ifactory)
@@ -158,53 +154,18 @@ gboolean check_emacs_key_theme(GtkWindow *window, GtkItemFactory *ifactory)
 	"}\n"
 	);
 	
-/*	gtk_widget_remove_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/File/New"),
-		accel_group, GDK_N, GDK_CONTROL_MASK);
-	gtk_widget_remove_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/File/Open..."),
-		accel_group, GDK_O, GDK_CONTROL_MASK);
-	gtk_widget_remove_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/File/Save"),
-		accel_group, GDK_S, GDK_CONTROL_MASK);
-	gtk_widget_remove_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/File/Save As..."),
-		accel_group, GDK_S, GDK_SHIFT_MASK | GDK_CONTROL_MASK);
-#ifdef ENABLE_PRINT
-	gtk_widget_remove_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/File/Print..."),
-		accel_group, GDK_P, GDK_CONTROL_MASK);
-#endif
-	gtk_widget_remove_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/Edit/Undo"),
-		accel_group, GDK_Z, GDK_CONTROL_MASK);
-*/	gtk_widget_add_accelerator(
+	gtk_widget_add_accelerator(
 		gtk_item_factory_get_widget(ifactory, "/Edit/Undo"),
 		"activate", accel_group, GDK_underscore, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-/*	gtk_widget_remove_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/Edit/Select All"),
-		accel_group, GDK_A, GDK_CONTROL_MASK);
-	gtk_widget_remove_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/Search/Find..."),
-		accel_group, GDK_F, GDK_CONTROL_MASK);
-*/	gtk_widget_add_accelerator(
+	gtk_widget_add_accelerator(
 		gtk_item_factory_get_widget(ifactory, "/Search/Find..."),
 		"activate", accel_group, GDK_S, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-/*	gtk_widget_add_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/Search/Find Next"),
-		"activate", accel_group, GDK_S, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-*/	gtk_widget_add_accelerator(
+	gtk_widget_add_accelerator(
 		gtk_item_factory_get_widget(ifactory, "/Search/Find Previous"),
 		"activate", accel_group, GDK_R, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-/*	gtk_widget_remove_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/Search/Replace..."),
-		accel_group, GDK_H, GDK_CONTROL_MASK);
-*/	gtk_widget_add_accelerator(
+	gtk_widget_add_accelerator(
 		gtk_item_factory_get_widget(ifactory, "/Search/Replace..."),
 		"activate", accel_group, GDK_percent, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);
-/*	gtk_widget_remove_accelerator(
-		gtk_item_factory_get_widget(ifactory, "/Search/Jump To..."),
-		accel_group, GDK_J, GDK_CONTROL_MASK);
 */	gtk_widget_add_accelerator(
 		gtk_item_factory_get_widget(ifactory, "/Search/Jump To..."),
 		"activate", accel_group, GDK_G, GDK_MOD1_MASK, GTK_ACCEL_VISIBLE);

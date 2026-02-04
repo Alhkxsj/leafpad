@@ -143,10 +143,8 @@ void menu_sensitivity_from_selection_bound(gboolean is_bound_exist)
 	gtk_widget_set_sensitive(menu_item_delete, is_bound_exist);
 }
 
-//void menu_sensitivity_from_clipboard(gboolean is_clipboard_exist)
 void menu_sensitivity_from_clipboard(void)
 {
-//g_print("clip board checked.\n");
 	gtk_widget_set_sensitive(menu_item_paste,
 		gtk_clipboard_wait_is_text_available(
 			gtk_clipboard_get(GDK_SELECTION_CLIPBOARD)));
@@ -156,19 +154,7 @@ GtkWidget *create_menu_bar(GtkWidget *window)
 {
 	GtkAccelGroup *accel_group;
 	GtkItemFactory *ifactory;
-	gboolean flag_emacs = FALSE;
-	
-	gchar *key_theme = NULL;
-	GtkSettings *settings = gtk_settings_get_default();
-	if (settings) {
-		g_object_get(settings, "gtk-key-theme-name", &key_theme, NULL);
-		if (key_theme) {
-			if (!g_ascii_strcasecmp(key_theme, "Emacs"))
-				flag_emacs = TRUE;
-			g_free(key_theme);
-		}
-	}
-	
+
 	accel_group = gtk_accel_group_new();
 	ifactory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, "<main>", accel_group);
 	gtk_item_factory_set_translate_func(ifactory, menu_translate, NULL, NULL);
@@ -213,7 +199,6 @@ GtkWidget *create_menu_bar(GtkWidget *window)
 	menu_item_delete = gtk_item_factory_get_widget(ifactory, "/Edit/Delete");
 	menu_sensitivity_from_selection_bound(FALSE);
 	
-	// Add recent files menu
 	GtkWidget *file_menu = gtk_item_factory_get_widget(ifactory, "/File");
 	GtkWidget *recent_menu = gtk_menu_new();
 	GtkWidget *recent_item;
